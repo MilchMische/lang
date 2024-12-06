@@ -32,10 +32,6 @@ if 'data' not in st.session_state:
 if 'data' in st.session_state and st.session_state.data is not None:
     data = st.session_state.data
 
-    # Unsichtbarer Button zum Neuladen der bereits geladenen Datei
-    # Reload der Seite wird durch ein Rerun erzeugt
-    st.experimental_rerun()
-
     # Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
     st.markdown("""
     <style>
