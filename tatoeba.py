@@ -40,7 +40,7 @@ def display_sentence():
     else:
         return None, None
 
-# Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
+# Fade-In & Fade-Out Animation für beide Sätze gleichzeitig
 st.markdown("""
 <style>
 .fade {
@@ -56,16 +56,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Anzeige der Sätze mit dynamischem Update
-italian_block = st.empty()
-english_block = st.empty()
+sentence_block = st.empty()  # Ein Block für beide Sätze
 
 if 'data' in st.session_state:
     if st.button("Datei neu einlesen"):
-        italian_sentence, english_translation = display_sentence()
-        if italian_sentence and english_translation:
-            italian_block.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
-            time.sleep(3)
-            english_block.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
+        st.session_state['start_display'] = True
     
     # Automatisches Wechseln der Sätze alle 6 Sekunden
     if 'start_display' not in st.session_state:
@@ -75,10 +70,13 @@ if 'data' in st.session_state:
         while True:
             italian_sentence, english_translation = display_sentence()
             if italian_sentence and english_translation:
-                italian_block.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
-                time.sleep(3)
-                english_block.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
-                time.sleep(3)
-
+                # Beide Sätze im selben Block anzeigen
+                sentence_block.markdown(f"""
+                <div class='fade'>
+                    <h3>{italian_sentence}</h3>
+                    <h3>{english_translation}</h3>
+                </div>
+                """, unsafe_allow_html=True)
+                time.sleep(6)  # 6 Sekunden warten, bevor die Sätze wechseln
 else:
     st.write("Lade eine Datei hoch, um zu beginnen.")
