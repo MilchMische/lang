@@ -24,14 +24,13 @@ st.title("Tatoeba Satzanzeige mit Fade-Effekt")
 # Datei hochladen
 uploaded_file = st.file_uploader("Lade eine TSV-Datei hoch", type=["tsv"])
 
-# Daten nur einmal laden und im Session State speichern
-if 'data' not in st.session_state:
-    if uploaded_file is not None:
-        st.session_state['data'] = load_data(uploaded_file)
+# Wenn die Datei hochgeladen wurde, Daten laden und in Session State speichern
+if uploaded_file is not None:
+    st.session_state['data'] = load_data(uploaded_file)
 
-# Funktion zum Anzeigen eines zufälligen Satzes
-def display_sentence():
-    if st.session_state.get('data') is not None:
+# Funktion, um einen neuen Satz anzuzeigen
+def display_sentences():
+    if 'data' in st.session_state and st.session_state['data'] is not None:
         data = st.session_state['data']
         
         # Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
@@ -49,28 +48,35 @@ def display_sentence():
         </style>
         """, unsafe_allow_html=True)
 
-        # Zufälligen Index für den Satz auswählen
-        random_index = random.randint(0, len(data) - 1)
+        # Wiederholter Wechsel der Sätze
+        while True:
+            # Zufälligen Index für den Satz auswählen
+            random_index = random.randint(0, len(data) - 1)
 
-        italian_sentence = data.iloc[random_index, 0]
-        english_translation = data.iloc[random_index, 1]
+            italian_sentence = data.iloc[random_index, 0]
+            english_translation = data.iloc[random_index, 1]
 
-        # Block für den italienischen Satz
-        italian_block = st.empty()
-        italian_block.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
+            # Block für den italienischen Satz
+            italian_block = st.empty()
+            italian_block.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
+            time.sleep(3)  # 3 Sekunden warten
 
-        # Block für die englische Übersetzung
-        english_block = st.empty()
-        english_block.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
+            # Block für die englische Übersetzung
+            english_block = st.empty()
+            english_block.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
+            time.sleep(3)  # 3 Sekunden warten
 
-        # Lösche die Inhalte der vorherigen Sätze nach 3 Sekunden
-        time.sleep(3)
-        italian_block.empty()
-        english_block.empty()
+            # Lösche die Inhalte der vorherigen Sätze
+            italian_block.empty()
+            english_block.empty()
 
-# Wenn Daten vorhanden sind, zeige den Button an
+# Wenn eine Datei hochgeladen wurde oder im Session State vorhanden ist, automatisch Sätze anzeigen
+if 'data' in st.session_state and st.session_state['data'] is not None:
+    display_sentences()
+
+# Button, um die Daten neu zu laden (ohne erneut hochzuladen)
 if 'data' in st.session_state:
-    if st.button("Sätze neu laden"):
-        display_sentence()
+    if st.button("Datei neu einlesen"):
+        display_sentences()
 else:
     st.write("Lade eine Datei hoch, um zu beginnen.")
