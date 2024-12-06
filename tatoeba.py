@@ -38,9 +38,8 @@ if 'data' in st.session_state and st.session_state.data is not None:
     reload_button = st.button("Daten neu laden", help="Drücke diesen Knopf, um die Datei neu einzulesen")
 
     if reload_button:
-        # Nur den Inhalt der Sätze löschen, ohne die Daten neu zu laden
+        # Lade die Datei erneut aus dem gespeicherten Session-State
         st.session_state.data = load_data(uploaded_file)  # Datei neu einlesen
-        st.experimental_rerun()  # App neu laden, um den neuen Satz anzuzeigen
 
     # Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
     st.markdown("""
