@@ -21,25 +21,20 @@ def load_data(uploaded_file):
 # Streamlit app layout
 st.set_page_config(page_title="Tatoeba Satzanzeige", layout="centered")  # Zentriere die Inhalte
 
-# Datei hochladen und in den Session-State speichern
+# Überprüfen, ob die Datei bereits hochgeladen wurde
 if 'data' not in st.session_state:
     uploaded_file = st.file_uploader("Lade eine TSV-Datei hoch", type=["tsv"])
-
+    
     if uploaded_file is not None:
         st.session_state.data = load_data(uploaded_file)
-else:
-    uploaded_file = None  # Keine weitere Datei benötigt
 
-# Sobald die Datei hochgeladen ist, Titel und Upload-Schaltfläche entfernen
+# Wenn die Datei bereits geladen wurde, verwende die Daten aus dem Session-State
 if 'data' in st.session_state and st.session_state.data is not None:
     data = st.session_state.data
 
     # Unsichtbarer Button zum Neuladen der bereits geladenen Datei
-    reload_button = st.button("Daten neu laden", help="Drücke diesen Knopf, um die Datei neu einzulesen")
-
-    if reload_button:
-        # Lade die Datei erneut aus dem gespeicherten Session-State
-        st.session_state.data = load_data(uploaded_file)  # Datei neu einlesen
+    # Reload der Seite wird durch ein Rerun erzeugt
+    st.experimental_rerun()
 
     # Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
     st.markdown("""
@@ -50,14 +45,6 @@ if 'data' in st.session_state and st.session_state.data is not None:
     @keyframes fadeInOut {
         0% { opacity: 0; }
         100% { opacity: 1; }
-    }
-    button[title="Daten neu laden"] {
-        visibility: hidden;  /* Unsichtbar, aber funktional */
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        width: 30px;
-        height: 30px;
     }
     </style>
     """, unsafe_allow_html=True)
