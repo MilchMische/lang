@@ -21,34 +21,35 @@ def load_data(uploaded_file):
 # Streamlit app layout
 st.title("Tatoeba Satzanzeige mit Fade-Effekt")
 
-# Datei hochladen, aber nur, wenn sie noch nicht geladen wurde
+# Datei hochladen
+uploaded_file = st.file_uploader("Lade eine TSV-Datei hoch", type=["tsv"])
+
+# Daten nur einmal laden und im Session State speichern
 if 'data' not in st.session_state:
-    uploaded_file = st.file_uploader("Lade eine TSV-Datei hoch", type=["tsv"])
-    
     if uploaded_file is not None:
-        st.session_state.data = load_data(uploaded_file)
+        st.session_state['data'] = load_data(uploaded_file)
 
-# Wenn die Datei bereits hochgeladen wurde, die Sätze anzeigen
-if 'data' in st.session_state and st.session_state.data is not None:
-    data = st.session_state.data
-    
-    # Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
-    st.markdown("""
-    <style>
-    .fade {
-        animation: fadeInOut 6s;
-    }
-    @keyframes fadeInOut {
-        0% { opacity: 0; }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% { opacity: 0; }
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# Funktion zum Anzeigen eines zufälligen Satzes
+def display_sentence():
+    if st.session_state.get('data') is not None:
+        data = st.session_state['data']
+        
+        # Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
+        st.markdown("""
+        <style>
+        .fade {
+            animation: fadeInOut 6s;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
-    # Wiederholter Wechsel der Sätze
-    if st.button("Sätze neu laden"):
+        # Zufälligen Index für den Satz auswählen
         random_index = random.randint(0, len(data) - 1)
 
         italian_sentence = data.iloc[random_index, 0]
@@ -67,5 +68,9 @@ if 'data' in st.session_state and st.session_state.data is not None:
         italian_block.empty()
         english_block.empty()
 
+# Wenn Daten vorhanden sind, zeige den Button an
+if 'data' in st.session_state:
+    if st.button("Sätze neu laden"):
+        display_sentence()
 else:
-    st.info("Bitte lade eine TSV-Datei hoch, um fortzufahren.")
+    st.write("Lade eine Datei hoch, um zu beginnen.")
