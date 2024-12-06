@@ -24,59 +24,61 @@ st.title("Tatoeba Satzanzeige mit Fade-Effekt")
 # Datei hochladen
 uploaded_file = st.file_uploader("Lade eine TSV-Datei hoch", type=["tsv"])
 
-# Wenn die Datei hochgeladen wurde, Daten laden und in Session State speichern
+# Daten nach Upload speichern
 if uploaded_file is not None:
     st.session_state['data'] = load_data(uploaded_file)
 
-# Funktion, um einen neuen Satz anzuzeigen
-def display_sentences():
+# Funktion zum Anzeigen eines zufälligen Satzes
+def display_sentence():
     if 'data' in st.session_state and st.session_state['data'] is not None:
         data = st.session_state['data']
-        
-        # Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
-        st.markdown("""
-        <style>
-        .fade {
-            animation: fadeInOut 6s;
-        }
-        @keyframes fadeInOut {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-        </style>
-        """, unsafe_allow_html=True)
+        # Zufälligen Index für den Satz auswählen
+        random_index = random.randint(0, len(data) - 1)
+        italian_sentence = data.iloc[random_index, 0]
+        english_translation = data.iloc[random_index, 1]
+        return italian_sentence, english_translation
+    else:
+        return None, None
 
-        # Wiederholter Wechsel der Sätze
-        while True:
-            # Zufälligen Index für den Satz auswählen
-            random_index = random.randint(0, len(data) - 1)
+# Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
+st.markdown("""
+<style>
+.fade {
+    animation: fadeInOut 6s;
+}
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+}
+</style>
+""", unsafe_allow_html=True)
 
-            italian_sentence = data.iloc[random_index, 0]
-            english_translation = data.iloc[random_index, 1]
+# Anzeige der Sätze mit dynamischem Update
+italian_block = st.empty()
+english_block = st.empty()
 
-            # Block für den italienischen Satz
-            italian_block = st.empty()
-            italian_block.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
-            time.sleep(3)  # 3 Sekunden warten
-
-            # Block für die englische Übersetzung
-            english_block = st.empty()
-            english_block.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
-            time.sleep(3)  # 3 Sekunden warten
-
-            # Lösche die Inhalte der vorherigen Sätze
-            italian_block.empty()
-            english_block.empty()
-
-# Wenn eine Datei hochgeladen wurde oder im Session State vorhanden ist, automatisch Sätze anzeigen
-if 'data' in st.session_state and st.session_state['data'] is not None:
-    display_sentences()
-
-# Button, um die Daten neu zu laden (ohne erneut hochzuladen)
 if 'data' in st.session_state:
     if st.button("Datei neu einlesen"):
-        display_sentences()
+        italian_sentence, english_translation = display_sentence()
+        if italian_sentence and english_translation:
+            italian_block.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
+            time.sleep(3)
+            english_block.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
+    
+    # Automatisches Wechseln der Sätze alle 6 Sekunden
+    if 'start_display' not in st.session_state:
+        st.session_state['start_display'] = True
+
+    if st.session_state['start_display']:
+        while True:
+            italian_sentence, english_translation = display_sentence()
+            if italian_sentence and english_translation:
+                italian_block.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
+                time.sleep(3)
+                english_block.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
+                time.sleep(3)
+
 else:
     st.write("Lade eine Datei hoch, um zu beginnen.")
