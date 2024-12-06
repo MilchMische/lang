@@ -35,10 +35,12 @@ if 'data' in st.session_state and st.session_state.data is not None:
     data = st.session_state.data
 
     # Unsichtbarer Button zum Neuladen der bereits geladenen Datei
-    if st.button("Daten neu laden", help="Drücke diesen Knopf, um die Datei neu einzulesen"):
-        # Kein erneutes Einlesen, sondern einfaches Neusetzen des DataFrames
-        st.session_state.data = st.session_state.data.copy()
-        st.experimental_rerun()  # Streamlit neu laden
+    reload_button = st.button("Daten neu laden", help="Drücke diesen Knopf, um die Datei neu einzulesen")
+
+    if reload_button:
+        # Nur den Inhalt der Sätze löschen, ohne die Daten neu zu laden
+        st.session_state.data = load_data(uploaded_file)  # Datei neu einlesen
+        st.experimental_rerun()  # App neu laden, um den neuen Satz anzuzeigen
 
     # Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
     st.markdown("""
