@@ -21,7 +21,7 @@ def load_data(uploaded_file):
 # Streamlit app layout
 st.set_page_config(page_title="Tatoeba Satzanzeige", layout="centered")  # Zentriere die Inhalte
 
-# Datei hochladen
+# Datei hochladen und in den Session-State speichern
 if 'data' not in st.session_state:
     uploaded_file = st.file_uploader("Lade eine TSV-Datei hoch", type=["tsv"])
 
@@ -34,9 +34,9 @@ else:
 if 'data' in st.session_state and st.session_state.data is not None:
     data = st.session_state.data
 
-    # Unsichtbarer Button zum Neuladen der Datei
+    # Unsichtbarer Button zum Neuladen der bereits geladenen Datei
     if st.button("Daten neu laden", help="Drücke diesen Knopf, um die Datei neu einzulesen"):
-        st.session_state.data = load_data(uploaded_file)
+        st.session_state.data = load_data(st.session_state.data)
         st.experimental_rerun()  # Streamlit neu laden
 
     # Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
