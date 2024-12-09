@@ -7,7 +7,7 @@ import time
 def load_data(uploaded_file):
     try:
         # Datei einlesen und nur die Spalten mit den relevanten Daten behalten
-        data = pd.read_csv(uploaded_file, sep="\t", header=None, usecols=[1, 3], on_bad_lines="skip")
+        data = pd.read_csv(uploaded_file, sep="\t", header=None, usecols=[0, 1], on_bad_lines="skip")
         
         # Überprüfen, ob mindestens 2 Spalten vorhanden sind
         if data.shape[1] < 2:
@@ -37,9 +37,9 @@ if 'data' in st.session_state and st.session_state.data is not None:
         st.session_state.language = 'it'  # Standardmäßig Italienisch
     
     # Button zum Umschalten der Sprache
-    if st.button('Sprache wechseln (Deutsch/Italienisch)'):
+    if st.button('Sprache wechseln (Italienisch/Englisch)'):
         if st.session_state.language == 'it':
-            st.session_state.language = 'de'  # Wechsel zu Deutsch
+            st.session_state.language = 'en'  # Wechsel zu Englisch
         else:
             st.session_state.language = 'it'  # Wechsel zu Italienisch
 
@@ -62,10 +62,12 @@ if 'data' in st.session_state and st.session_state.data is not None:
         random_index = random.randint(0, len(data) - 1)
 
         italian_sentence = data.iloc[random_index, 0]
-        german_translation = data.iloc[random_index, 1]  # Hier den deutschen Satz aus der Datei annehmen
+        english_translation = data.iloc[random_index, 1]
 
-        # Block für den italienischen oder deutschen Satz je nach Sprache
-        sentence = italian_sentence if st.session_state.language == 'it' else german_translation
+        # Je nach Sprache entweder den italienischen Satz oder die englische Übersetzung anzeigen
+        sentence = italian_sentence if st.session_state.language == 'it' else english_translation
+        
+        # Block für den Satz
         sentence_block = st.empty()
         sentence_block.markdown(f"<h3 class='fade'>{sentence}</h3>", unsafe_allow_html=True)
         
